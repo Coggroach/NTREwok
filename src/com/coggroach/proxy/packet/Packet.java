@@ -1,8 +1,5 @@
 package com.coggroach.proxy.packet;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.coggroach.proxy.SocketData;
 
 public class Packet
@@ -10,7 +7,7 @@ public class Packet
 	private byte[] header;
 	private byte[] trailer;
 	private byte[] protocol;
-	private List<String> payload;
+	private byte[] payload;
 	private byte[] checksum;
 
 	public static final Packet HANDSHAKE_PACKET = new Packet();
@@ -20,10 +17,10 @@ public class Packet
 	
 	static
 	{
-		HANDSHAKE_PACKET.addToPayload("GoodMorning");
-		ACK_PACKET.addToPayload("ACK");
-		NAK_PACKET.addToPayload("NAK");
-		TERMINATE_PACKET.addToPayload("ByeBye");		
+		HANDSHAKE_PACKET.addToPayload("GoodMorning".getBytes());
+		ACK_PACKET.addToPayload("ACK".getBytes());
+		NAK_PACKET.addToPayload("NAK".getBytes());
+		TERMINATE_PACKET.addToPayload("ByeBye".getBytes());		
 		
 		byte index = 0;
 		
@@ -39,9 +36,27 @@ public class Packet
 	{
 		this.header = new byte[SocketData.HEADER_LENGTH];
 		this.trailer = new byte[SocketData.TRAILER_LENGTH];
-		this.payload = new ArrayList<String>();
+		this.payload = new byte[SocketData.MAX_PAYLOAD_LENGTH];
 		this.checksum = new byte[SocketData.CHECKSUM_LENGTH];
 		this.protocol = new byte[SocketData.PROTOCOL_LENGTH];
+	}
+	
+	private int getTotalPacketSize()
+	{
+		return this.header.length + this.protocol.length + this.payload.length + this.checksum.length + this.trailer.length;
+	}
+	
+	public byte[] getBytes()
+	{
+		byte[] total = new byte[this.getTotalPacketSize()];
+		
+		System.arraycopy(header, 0, total, 0, header.length);
+		System.arraycopy(protocol, 0, total, 0, protocol.length);
+		System.arraycopy(payload, 0, total, 0, payload.length);
+		System.arraycopy(checksum, 0, total, 0, checksum.length);
+		System.arraycopy(trailer, 0, total, 0, trailer.length);
+		
+		return total;
 	}
 
 	private void initPacket()
@@ -88,9 +103,9 @@ public class Packet
 		{
 			s += protocol[i];
 		}
-		for(int i = 0; i < payload.size(); i++)
+		for(int i = 0; i < payload.length; i++)
 		{
-			s += payload.get(i);
+			s += payload[i];
 		}
 		for(int i = 0; i < checksum.length; i++)
 		{
@@ -111,9 +126,9 @@ public class Packet
 		}
 	}
 
-	public void addToPayload(String s)
+	public void addToPayload(byte[] b)
 	{
-		this.payload.add(s);
+		this.payload = b;
 	}
 
 }

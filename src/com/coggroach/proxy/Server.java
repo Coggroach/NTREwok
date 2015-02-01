@@ -11,10 +11,9 @@ public class Server
 
 	public Server(int i) throws IOException
 	{
-		this.server = new ServerSocket(i);
-		this.writeStartup();
+		this.server = new ServerSocket(i);		
 		this.index = 0;
-		this.isRunning = false;
+		this.isRunning = true;
 	}
 	
 	public void writeStartup()
@@ -24,6 +23,7 @@ public class Server
 
 	public void run()
 	{
+		this.writeStartup();
 		while (isRunning)
 		{
 			ClientWorker w;

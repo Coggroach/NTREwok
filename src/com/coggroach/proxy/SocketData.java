@@ -2,7 +2,7 @@ package com.coggroach.proxy;
 
 public class SocketData
 {
-	public static final int SOCKET = 6063;
+	public static final int SOCKET = 4991;
 	public static final String IPADDRESS = "localhost";
 	public static final int HEADER_LENGTH = 1;
 	public static final int TRAILER_LENGTH = 1;

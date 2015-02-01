@@ -21,23 +21,16 @@ public class NetworkClient
 		try
 		{
 			client = new Client(SocketData.SOCKET);
-		} catch (UnknownHostException e)
+		} catch (Exception e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.exit(-1);
 		}
 
-		//Scanner scanner = new Scanner(System.in);
 		while (isRunning)
 		{
 			try
-			{
-				System.out.println("Enter Data:");
-				//client.transmit(scanner.nextLine());
+			{				
 				client.transmit(Packet.HANDSHAKE_PACKET);
 				client.transmit(FileIO.readFromFile(file));
 				client.transmit(Packet.TERMINATE_PACKET);
@@ -45,9 +38,7 @@ public class NetworkClient
 				isRunning = false;
 			} catch (IOException e)
 			{
-				// TODO Auto-generated catch block
 				e.printStackTrace();
-				//scanner.close();
 			}
 		}
 		

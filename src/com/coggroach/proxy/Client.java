@@ -3,6 +3,7 @@ package com.coggroach.proxy;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -15,7 +16,7 @@ public class Client
 {
 	private Socket client;
 	private BufferedReader input;
-	private PrintWriter output;
+	private OutputStream output;
 	private List<Byte> packetIds;
 	private byte currentByte;
 
@@ -43,19 +44,20 @@ public class Client
 	{
 		this.input = new BufferedReader(new InputStreamReader(
 				client.getInputStream()));
-		this.output = new PrintWriter(client.getOutputStream(), true);
+		this.output = client.getOutputStream();
 	}
 	
-	public void transmit(Packet p)
+	public void transmit(Packet p) throws IOException
 	{
-		output.println(p.getStringToSend(getNextByteId()));
+		output.write(p.getBytes());
 	}
 
-	public void transmit(String s)
+	public void transmit(String s) throws IOException
 	{
 		Packet p = new Packet();
-		p.addToPayload(s);		
-		output.println(p.getStringToSend(getNextByteId()));
+		p.addToPayload(s.getBytes());		
+		//output.println(p.getStringToSend(getNextByteId()));
+		output.write(p.getBytes());
 	}
 
 	public String receive() throws IOException
