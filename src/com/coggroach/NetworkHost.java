@@ -1,7 +1,10 @@
 package com.coggroach;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.SocketException;
 
+import com.coggroach.common.FileIO;
 import com.coggroach.common.NetworkInfo;
 import com.coggroach.proxy.Server;
 
@@ -9,25 +12,28 @@ public class NetworkHost
 {
 	public static void main(String args[])
 	{
-		Server server = null;
-		try
-		{
-			server = new Server(NetworkInfo.SOCKET);
-		} catch (IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			System.exit(-1);
-		}
+		Server server = null;		
 		
 		try
 		{
+			server = new Server(NetworkInfo.SOCKET);
 			server.run();
 		}
 		catch (IOException e)
 		{
 			e.printStackTrace();
 			System.exit(-1);
+		}
+		
+		File f = new File("res/Output.txt");	
+		try
+		{
+			FileIO.writeToFile(f, server.s);
+		}
+		catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }

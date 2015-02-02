@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 
 import com.coggroach.common.NetworkInfo;
@@ -17,8 +18,9 @@ public class CommonSocket implements Runnable
 	private OutputStream output;
 	private String identity;
 	private SocketListener listener;
+	private int inputIndex;
 	
-	public CommonSocket(int socket) throws UnknownHostException, IOException
+	public CommonSocket(int socket) throws UnknownHostException, IOException, SocketException
 	{
 		this(new Socket(NetworkInfo.IPADDRESS, socket), null);		
 	}
@@ -29,11 +31,29 @@ public class CommonSocket implements Runnable
 		this.init();
 		this.identity = id;
 		this.listener = null;
+		this.inputIndex = 0;
+	}
+	
+	public void setTimeOut() throws SocketException
+	{
+		this.socket.setSoTimeout(NetworkInfo.TIMEOUT);
+	}
+	
+	public void setIdentity(String s)
+	{
+		this.identity = s;
 	}
 	
 	public String getIdentity()
 	{
 		return this.identity;
+	}
+	
+	public void close() throws IOException
+	{
+		this.input.close();
+		this.output.close();		
+		this.socket.close();
 	}
 	
 	public void setSocketListener(SocketListener listener)
@@ -49,7 +69,7 @@ public class CommonSocket implements Runnable
 
 	public void transmit(Packet p) throws IOException
 	{
-		output.write(p.getBytes());
+		output.write(p.getBytes());		
 	}
 
 	public void transmit(String s) throws IOException, PacketException
@@ -61,9 +81,13 @@ public class CommonSocket implements Runnable
 
 	public Packet receive() throws IOException
 	{
-		Packet p = new Packet();
-		input.read(p.getBytes());		
-		return p;
+		if(input.read() != -1)
+		{
+			Packet p = new Packet();
+			input.read(p.getBytes());		
+			return p;
+		}
+		return null;
 	}
 	
 	@Override

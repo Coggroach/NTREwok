@@ -1,5 +1,8 @@
 package com.coggroach.packet;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import com.coggroach.common.NetworkInfo;
 
 public class Packet
@@ -35,25 +38,17 @@ public class Packet
 
 	private void setPacketId(byte b)
 	{
-//		for (int i = 0; i < NetworkInfo.PROTOCOL_LENGTH; i++)
-//		{
-//			this.stream[NetworkInfo.getIndex(NetworkInfo.PROTOCOL)] = (i == NetworkInfo.PROTOCOL_LENGTH - 1) ? b : 0;
-//		}
+		this.stream[ NetworkInfo.getIndex(NetworkInfo.PROTOCOL) ] = b;
 	}
 	
-	public String getStringToSend(byte b)
-	{
-		return this.getPacketToSend(b).getString();
+	public String getString()
+	{	
+		return new String(stream);		
 	}
 	
-	private String getString()
+	public void print()
 	{
-		String s = "";
-		for(int i = 0; i < this.stream.length; i++)
-		{
-			s += stream[i];
-		}
-		return s;
+		System.out.println(this.getString());
 	}
 
 	private void preformChecksum()
@@ -65,15 +60,28 @@ public class Packet
 	{
 		this.add(s.getBytes());
 	}
-
-	public void add(byte[] b) throws PacketException
+	
+	public void add(InputStream input) throws IOException
 	{
-		if(b.length > NetworkInfo.getLength(NetworkInfo.PAYLOAD))
+		input.read(this.stream);		
+	}
+
+	private void add(byte[] b) throws PacketException
+	{
+		int length = NetworkInfo.getLength(NetworkInfo.PAYLOAD);
+		int index = NetworkInfo.getIndex(NetworkInfo.PAYLOAD);
+		
+//		System.out.println("PayloadLength: " + b.length);
+//		System.out.println("StreamLength: " + this.stream.length);
+//		System.out.println("Index: " + index);
+//		System.out.println("Length: " + length);
+		
+		if(b.length > length)
 			throw new PacketException();
 		
-		for(int i = NetworkInfo.getIndex(NetworkInfo.PAYLOAD - 1); i < NetworkInfo.getIndex(NetworkInfo.PAYLOAD); i++)
-		{
-			this.stream[i] = b[i];
+		for(int i = 0, j = 0; i < length && j < b.length; i++, j++)
+		{			
+			this.stream[i + index - 1] = b[j];
 		}
 	}
 

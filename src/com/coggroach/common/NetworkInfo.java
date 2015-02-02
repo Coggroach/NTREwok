@@ -4,6 +4,7 @@ public class NetworkInfo
 {
 	public static final int SOCKET = 4991;
 	public static final String IPADDRESS = "localhost";
+	public static final int TIMEOUT = 2000;
 	
 	private static final int HEADER_LENGTH = 1;
 	private static final int TRAILER_LENGTH = 1;
@@ -16,6 +17,7 @@ public class NetworkInfo
 	public static final int PAYLOAD = 2;
 	public static final int CHECKSUM = 3;
 	public static final int TRAILER = 4;
+	public static final int LENGTH = 5;
 	
 	
 	public static int getMaxPacketSize()
@@ -46,16 +48,17 @@ public class NetworkInfo
 		int index = 0;
 		switch(code)
 		{		
-		case TRAILER:
+		case LENGTH:
 			index += TRAILER_LENGTH;
-		case CHECKSUM:
+		case TRAILER:
 			index += CHECKSUM_LENGTH;
-		case PAYLOAD:
+		case CHECKSUM:
 			index += MAX_PAYLOAD_LENGTH;
-		case PROTOCOL:
+		case PAYLOAD:
 			index += PROTOCOL_LENGTH;
-		case HEADER:
+		case PROTOCOL:
 			index += HEADER_LENGTH;
+		case HEADER:
 			break;
 		}
 		return index;
