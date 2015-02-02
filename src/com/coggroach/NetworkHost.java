@@ -2,7 +2,7 @@ package com.coggroach;
 
 import java.io.IOException;
 
-import com.coggroach.proxy.SocketData;
+import com.coggroach.common.NetworkInfo;
 import com.coggroach.proxy.Server;
 
 public class NetworkHost
@@ -12,7 +12,7 @@ public class NetworkHost
 		Server server = null;
 		try
 		{
-			server = new Server(SocketData.SOCKET);
+			server = new Server(NetworkInfo.SOCKET);
 		} catch (IOException e)
 		{
 			// TODO Auto-generated catch block
@@ -20,6 +20,14 @@ public class NetworkHost
 			System.exit(-1);
 		}
 		
-		server.run();
+		try
+		{
+			server.run();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+			System.exit(-1);
+		}
 	}
 }
