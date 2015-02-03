@@ -1,4 +1,4 @@
-package com.coggroach;
+package com.coggroach.depr;
 
 import java.io.File;
 import java.io.IOException;

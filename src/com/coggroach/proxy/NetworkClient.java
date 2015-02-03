@@ -1,4 +1,4 @@
-package com.coggroach;
+package com.coggroach.proxy;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import com.coggroach.common.NetworkInfo;
 import com.coggroach.packet.Packet;
 import com.coggroach.packet.PacketException;
 import com.coggroach.packet.PacketHandler;
-import com.coggroach.proxy.CommonSocket;
+import com.coggroach.socket.CommonSocket;
 
 public class NetworkClient
 {
@@ -18,7 +18,7 @@ public class NetworkClient
 		CommonSocket client = null;
 		PacketHandler handler = new PacketHandler();
 		File file = new File("res/Input.txt");
-		//boolean isRunning = true;
+		// boolean isRunning = true;
 
 		try
 		{
@@ -35,15 +35,15 @@ public class NetworkClient
 		try
 		{
 			System.out.println("Identity: " + client.getIdentity());
-			handler.process(FileIO.readFromFile(file));
-			List<Packet> packets = handler.getPackets();			
-			System.out.println("Packets to Transmit: " + packets.size());
 
-			for (int i = 0; i < packets.size(); i++)
+			handler.process(FileIO.readFromFile(file));
+
+			while(!handler.isEmpty())
 			{
-				client.transmit(packets.get(i));
+				client.transmit(handler.getNext());
 				client.receive().print();
-			}
+			}		
+			
 			handler.clear();
 		}
 		catch (IOException e)

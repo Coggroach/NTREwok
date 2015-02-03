@@ -1,11 +1,10 @@
-package com.coggroach;
+package com.coggroach.depr;
 
 import java.io.File;
 import java.io.IOException;
 
 import com.coggroach.common.FileIO;
 import com.coggroach.common.NetworkInfo;
-import com.coggroach.proxy.Server;
 
 public class NetworkHost
 {

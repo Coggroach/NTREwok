@@ -1,4 +1,4 @@
-package com.coggroach.proxy;
+package com.coggroach.socket;
 
 public interface SocketListener
 {

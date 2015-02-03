@@ -78,6 +78,21 @@ public class Packet
 		return iTotal;
 	}
 	
+	public byte getAddress()
+	{
+		return this.stream[ NetworkInfo.getIndex(NetworkInfo.ADDRESS) ];
+	}
+	
+	public boolean isSameProtocol(byte b)
+	{
+		return this.stream[ NetworkInfo.getIndex(NetworkInfo.PROTOCOL) ] == b;
+	}
+	
+	public boolean hasSameAddress(byte b)
+	{
+		return this.stream[ NetworkInfo.getIndex(NetworkInfo.ADDRESS) ] == b;
+	}
+	
 	public boolean isValid()
 	{
 		return this.preformChecksum() == this.stream[NetworkInfo.getIndex(NetworkInfo.CHECKSUM)]; 

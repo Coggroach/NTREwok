@@ -1,4 +1,4 @@
-package com.coggroach.proxy;
+package com.coggroach.socket;
 
 import java.io.IOException;
 import java.io.InputStream;
