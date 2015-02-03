@@ -1,11 +1,9 @@
 package com.coggroach.proxy;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.SocketException;
 
-import com.coggroach.common.FileIO;
 import com.coggroach.packet.Packet;
 
 public class Server
@@ -53,6 +51,7 @@ public class Server
 								w.transmit(p);
 								s += p.getString();
 								p.print();
+								//System.out.println(p.isValid());
 							}
 						}
 						catch (IOException e)

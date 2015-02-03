@@ -18,12 +18,13 @@ public class NetworkClient
 		CommonSocket client = null;
 		PacketHandler handler = new PacketHandler();
 		File file = new File("res/Input.txt");
-		boolean isRunning = true;
+		//boolean isRunning = true;
 
 		try
 		{
 			client = new CommonSocket(NetworkInfo.SOCKET);
 			client.setTimeOut();
+			client.setIdentity("Client0");
 		}
 		catch (Exception e)
 		{

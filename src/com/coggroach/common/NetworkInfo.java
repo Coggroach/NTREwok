@@ -8,9 +8,9 @@ public class NetworkInfo
 	
 	private static final int HEADER_LENGTH = 1;
 	private static final int TRAILER_LENGTH = 1;
-	private static final int CHECKSUM_LENGTH = 2;
-	private static final int MAX_PAYLOAD_LENGTH = 8;
-	private static final int PROTOCOL_LENGTH = 2;
+	private static final int CHECKSUM_LENGTH = 1;
+	private static final int MAX_PAYLOAD_LENGTH = 16;
+	private static final int PROTOCOL_LENGTH = 1;
 	
 	public static final int HEADER = 0;
 	public static final int PROTOCOL = 1;

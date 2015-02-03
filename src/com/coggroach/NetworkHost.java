@@ -2,7 +2,6 @@ package com.coggroach;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.SocketException;
 
 import com.coggroach.common.FileIO;
 import com.coggroach.common.NetworkInfo;

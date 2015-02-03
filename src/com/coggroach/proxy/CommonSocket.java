@@ -18,49 +18,48 @@ public class CommonSocket implements Runnable
 	private OutputStream output;
 	private String identity;
 	private SocketListener listener;
-	private int inputIndex;
-	
-	public CommonSocket(int socket) throws UnknownHostException, IOException, SocketException
+
+	public CommonSocket(int socket) throws UnknownHostException, IOException,
+			SocketException
 	{
-		this(new Socket(NetworkInfo.IPADDRESS, socket), null);		
+		this(new Socket(NetworkInfo.IPADDRESS, socket), null);
 	}
-	
+
 	public CommonSocket(Socket s, String id) throws IOException
 	{
 		this.socket = s;
 		this.init();
 		this.identity = id;
 		this.listener = null;
-		this.inputIndex = 0;
 	}
-	
+
 	public void setTimeOut() throws SocketException
 	{
 		this.socket.setSoTimeout(NetworkInfo.TIMEOUT);
 	}
-	
+
 	public void setIdentity(String s)
 	{
 		this.identity = s;
 	}
-	
+
 	public String getIdentity()
 	{
 		return this.identity;
 	}
-	
+
 	public void close() throws IOException
 	{
 		this.input.close();
-		this.output.close();		
+		this.output.close();
 		this.socket.close();
 	}
-	
+
 	public void setSocketListener(SocketListener listener)
 	{
 		this.listener = listener;
 	}
-	
+
 	private void init() throws IOException
 	{
 		this.input = socket.getInputStream();
@@ -69,7 +68,7 @@ public class CommonSocket implements Runnable
 
 	public void transmit(Packet p) throws IOException
 	{
-		output.write(p.getBytes());		
+		output.write(p.getBytes());
 	}
 
 	public void transmit(String s) throws IOException, PacketException
@@ -81,19 +80,15 @@ public class CommonSocket implements Runnable
 
 	public Packet receive() throws IOException
 	{
-		if(input.read() != -1)
-		{
-			Packet p = new Packet();
-			input.read(p.getBytes());		
-			return p;
-		}
-		return null;
+		Packet p = new Packet();
+		input.read(p.getBytes());
+		return p;
 	}
-	
+
 	@Override
 	public void run()
-	{	
-		if(this.listener != null)
+	{
+		if (this.listener != null)
 		{
 			this.listener.listen();
 		}
