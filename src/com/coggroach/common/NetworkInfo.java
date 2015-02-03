@@ -8,16 +8,29 @@ public class NetworkInfo
 	
 	private static final int HEADER_LENGTH = 1;
 	private static final int TRAILER_LENGTH = 1;
+	private static final int ADDRESS_LENGTH = 1;
 	private static final int CHECKSUM_LENGTH = 1;
 	private static final int MAX_PAYLOAD_LENGTH = 16;
 	private static final int PROTOCOL_LENGTH = 1;
 	
 	public static final int HEADER = 0;
-	public static final int PROTOCOL = 1;
-	public static final int PAYLOAD = 2;
-	public static final int CHECKSUM = 3;
-	public static final int TRAILER = 4;
-	public static final int LENGTH = 5;
+	public static final int ADDRESS = 1;
+	public static final int PROTOCOL = 2;
+	public static final int PAYLOAD = 3;
+	public static final int CHECKSUM = 4;
+	public static final int TRAILER = 5;
+	public static final int LENGTH = 6;
+	
+	public static byte ACK_PROTOCOL;
+	public static byte NAK_PROTOCOL;
+	public static byte SND_PROTOCOL;
+	
+	static
+	{
+		ACK_PROTOCOL = 0b00111100;
+		NAK_PROTOCOL = 0b01100110;
+		SND_PROTOCOL = 0b00000001;		
+	}
 	
 	
 	public static int getMaxPacketSize()
@@ -39,6 +52,8 @@ public class NetworkInfo
 			return PROTOCOL_LENGTH;
 		case HEADER:
 			return HEADER_LENGTH;
+		case ADDRESS:
+			return ADDRESS_LENGTH;
 		}
 		return 0;
 	}
@@ -57,6 +72,8 @@ public class NetworkInfo
 		case PAYLOAD:
 			index += PROTOCOL_LENGTH;
 		case PROTOCOL:
+			index += ADDRESS_LENGTH;
+		case ADDRESS:
 			index += HEADER_LENGTH;
 		case HEADER:
 			break;

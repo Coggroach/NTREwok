@@ -42,9 +42,14 @@ public class Packet
 		return this;
 	}
 
-	private void setPacketId(byte b)
+	public void setPacketId(byte b)
 	{
-		this.stream[ NetworkInfo.getIndex(NetworkInfo.PROTOCOL) ] = b;
+		this.stream[ NetworkInfo.getIndex(NetworkInfo.ADDRESS) ] = b;
+	}
+	
+	public void setProtocol(byte b)
+	{
+		this.stream[ NetworkInfo.getIndex(NetworkInfo.PROTOCOL)] = b;
 	}
 	
 	public String getString()
