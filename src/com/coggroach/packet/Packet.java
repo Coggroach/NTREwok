@@ -29,7 +29,7 @@ public class Packet
 		this.stream[this.stream.length - 1] = FLAG_C;		
 	}
 	
-	private void initChecksum(int i)
+	private void setChecksum(int i)
 	{
 		this.stream[NetworkInfo.getIndex(NetworkInfo.CHECKSUM)] = (byte) i;
 	}
@@ -37,12 +37,24 @@ public class Packet
 	public Packet getPacketToSend(byte b)
 	{
 		this.initPacket();
-		this.initChecksum(this.preformChecksum());
-		this.setPacketId(b);
+		this.setChecksum(this.preformChecksum());
+		this.setAddress(b);
+		return this;
+	}
+	
+	public void setByte(int pos, byte b)
+	{	
+		this.stream[pos] = b;		
+	}
+	
+	public Packet wrap()
+	{
+		this.initPacket();
+		this.setChecksum(0);		
 		return this;
 	}
 
-	public void setPacketId(byte b)
+	public void setAddress(byte b)
 	{
 		this.stream[ NetworkInfo.getIndex(NetworkInfo.ADDRESS) ] = b;
 	}

@@ -2,11 +2,9 @@ package com.coggroach.proxy;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import com.coggroach.common.FileIO;
 import com.coggroach.common.NetworkInfo;
-import com.coggroach.packet.Packet;
 import com.coggroach.packet.PacketException;
 import com.coggroach.packet.PacketHandler;
 import com.coggroach.socket.CommonSocket;
@@ -34,16 +32,18 @@ public class NetworkClient
 
 		try
 		{
-			System.out.println("Identity: " + client.getIdentity());
+			client.print();
 
 			handler.process(FileIO.readFromFile(file));
+			handler.print();
 
 			while(!handler.isEmpty())
 			{
-				client.transmit(handler.getNext());
-				client.receive().print();
+				client.transmit(handler.getNext());				
+				handler.onReceive(client.receive());
 			}		
 			
+			handler.print();			
 			handler.clear();
 		}
 		catch (IOException e)

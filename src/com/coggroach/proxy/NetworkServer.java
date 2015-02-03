@@ -7,6 +7,7 @@ import java.net.ServerSocket;
 import com.coggroach.common.FileIO;
 import com.coggroach.common.NetworkInfo;
 import com.coggroach.packet.Packet;
+import com.coggroach.packet.PacketHandler;
 import com.coggroach.socket.CommonSocket;
 import com.coggroach.socket.SocketListener;
 
@@ -14,7 +15,7 @@ public class NetworkServer
 {
 	static ServerSocket server;
 	static CommonSocket common = null;
-	static String output = "";
+	static StringBuilder output = new StringBuilder();
 	
 	public static void main(String args[])
 	{		
@@ -27,7 +28,9 @@ public class NetworkServer
 		catch (IOException e1)
 		{
 			e1.printStackTrace();
-		}		
+		}
+		
+		common.print();
 
 		common.setSocketListener(new SocketListener()
 		{
@@ -42,14 +45,17 @@ public class NetworkServer
 						Packet p = common.receive();
 						if (p != null)
 						{
-							common.transmit(p);
-							output += p.getString();
-							p.print();
+							if(p.isValid())
+							{
+								common.transmit(PacketHandler.getAckPacket(p.getAddress()));
+								output.append(p.getString());
+							}						
+							//p.print();
 						}
 					}
 					catch (IOException e)
 					{
-						e.printStackTrace();
+						System.err.println("Client Disconnected");
 						run = false;						
 					}
 				}
@@ -62,7 +68,7 @@ public class NetworkServer
 		File f = new File("res/Output.txt");	
 		try
 		{
-			FileIO.writeToFile(f, output);
+			FileIO.writeToFile(f, output.toString());
 		}
 		catch (IOException e)
 		{		

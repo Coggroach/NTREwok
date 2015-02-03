@@ -1,5 +1,6 @@
 package com.coggroach.common;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -37,14 +38,18 @@ public class FileIO
 	}
 	
 	public static String readFromFile(File file) throws IOException
-	{
-		FileReader reader = new FileReader(file);
+	{		
+		BufferedReader reader = new BufferedReader(new FileReader(file));	
+		StringBuilder builder = new StringBuilder();
 		
-		char[] charArray = new char[1024];		
-		reader.read(charArray);
+		String line = "";
+		while( (line = reader.readLine()) != null)
+		{
+			builder.append(line);
+		}		
 		reader.close();
 		
-		return String.valueOf(charArray);
+		return builder.toString();
 	}
 	
 	

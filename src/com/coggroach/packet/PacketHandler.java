@@ -31,6 +31,40 @@ public class PacketHandler
 		this.index = 0;
 	}
 	
+	public void addPacket(Packet p)
+	{
+		this.packets.add(p);
+	}
+	
+	public List<Byte> getMissingPacketAddress()
+	{
+//		/Iterator<Packet>
+		return null;
+	}
+	
+	public static Packet getAckPacket(byte address)
+	{
+		Packet p = new Packet();
+		p.setProtocol(NetworkInfo.ACK_PROTOCOL);
+		p.setAddress(address);		
+		return p.wrap();
+	}	
+	
+	public static Packet getNakPacket(byte address)
+	{
+		Packet p = new Packet();
+		p.setAddress(address);
+		p.setProtocol(NetworkInfo.NAK_PROTOCOL);
+		return p.wrap();
+	}
+	
+	public void print()
+	{
+		System.out.println("PacketHandler");
+		System.out.println("Packets: " + this.packets.size());
+		System.out.println("Naks   : " + this.naks.size());
+	}
+	
 	public boolean isEmpty()
 	{
 		return this.packets.isEmpty();
@@ -39,8 +73,11 @@ public class PacketHandler
 	public Packet getNext()
 	{
 		if(this.naks.isEmpty())
-		{
-			return this.packets.get(index++);				
+		{		
+			if(index < this.packets.size())			
+				return this.packets.get(index++);
+			
+			return null;
 		}
 		
 		Iterator<Byte> iterator = this.naks.iterator();
@@ -68,7 +105,11 @@ public class PacketHandler
 		while(iterator.hasNext())
 		{
 			if(iterator.next().hasSameAddress(b))
+			{
 				iterator.remove();
+				index--;
+				return;
+			}
 		}
 	}
 	

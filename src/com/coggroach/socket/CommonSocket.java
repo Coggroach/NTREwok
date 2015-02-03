@@ -32,6 +32,11 @@ public class CommonSocket implements Runnable
 		this.identity = id;
 		this.listener = null;
 	}
+	
+	public void print()
+	{
+		System.out.println("Identity: " + this.identity);	
+	}
 
 	public void setTimeOut() throws SocketException
 	{
