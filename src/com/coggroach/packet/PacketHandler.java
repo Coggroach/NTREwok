@@ -122,6 +122,7 @@ public class PacketHandler
 		else if(p.isSameProtocol(NetworkInfo.NAK_PROTOCOL))
 		{
 			this.naks.add(p.getAddress());
+			System.out.println("Added NAK");
 		}
 	}
 	

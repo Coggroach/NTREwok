@@ -4,7 +4,7 @@ public class NetworkInfo
 {
 	public static final int SOCKET = 4991;
 	public static final String IPADDRESS = "localhost";
-	public static final int TIMEOUT = 2000;
+	public static final int TIMEOUT = 8000;
 	
 	private static final int HEADER_LENGTH = 1;
 	private static final int TRAILER_LENGTH = 1;
