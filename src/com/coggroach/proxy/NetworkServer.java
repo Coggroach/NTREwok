@@ -17,12 +17,6 @@ public class NetworkServer
 	static ServerSocket server;
 	static CommonSocket common = null;
 	static StringBuilder output = new StringBuilder();
-	static byte lastAddress = -1;
-	
-	private static boolean hasSkippedAddress(byte b1, byte b2)
-	{
-		return b1 + 1 < b2;
-	}
 	
 	public static void main(String args[])
 	{		
@@ -49,31 +43,13 @@ public class NetworkServer
 				{
 					try
 					{
-						Packet p = Gremlin.receive(common.receive());
-						if (p != null)
-						{
-							if(p.isValid())
-							{
-								if(hasSkippedAddress(lastAddress, p.getAddress()))
-								{
-									common.transmit(PacketHandler.getNakPacket((byte) (lastAddress + 1)));
-									System.out.println("NAK: " + (lastAddress + 1));
-								}
-								else
-								{
-									common.transmit(PacketHandler.getAckPacket(p.getAddress()));
-									output.append(p.getString());
-									lastAddress = p.getAddress();
-									System.out.println("ACK: " + lastAddress);
-								}								
-							}						
-							//p.print();
-						}
-						else
-						{
-							common.transmit(PacketHandler.getNakPacket((byte) (lastAddress + 1)));
-							System.out.println("NAK: " + (lastAddress + 1));
-						}
+						Packet p = common.receive();//Gremlin.receive(common.receive());
+						if(true)//p.isValid()
+						{	
+							common.transmit(PacketHandler.getAckPacket(p.getAddress()));
+							output.append(p.getString());						
+						}						
+						//p.print();
 					}
 					catch (IOException e)
 					{

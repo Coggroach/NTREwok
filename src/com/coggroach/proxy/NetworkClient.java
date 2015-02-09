@@ -41,6 +41,7 @@ public class NetworkClient
 			{
 				client.transmit(handler.getNext());				
 				handler.onReceive(client.receive());
+				//handler.print(0);
 			}		
 			
 			handler.print();			

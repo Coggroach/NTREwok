@@ -40,7 +40,12 @@ public class CommonSocket implements Runnable
 
 	public void setTimeOut() throws SocketException
 	{
-		this.socket.setSoTimeout(NetworkInfo.TIMEOUT);
+		this.setTimeOut(NetworkInfo.TIMEOUT);
+	}
+	
+	public void setTimeOut(int i) throws SocketException
+	{
+		this.socket.setSoTimeout(i);
 	}
 
 	public void setIdentity(String s)

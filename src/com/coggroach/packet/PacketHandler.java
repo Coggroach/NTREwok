@@ -53,8 +53,8 @@ public class PacketHandler
 	public static Packet getNakPacket(byte address)
 	{
 		Packet p = new Packet();
-		p.setAddress(address);
 		p.setProtocol(NetworkInfo.NAK_PROTOCOL);
+		p.setAddress(address);		
 		return p.wrap();
 	}
 	
@@ -65,19 +65,24 @@ public class PacketHandler
 		System.out.println("Naks   : " + this.naks.size());
 	}
 	
+	public void print(int i)
+	{
+		System.out.println("Packets: " + this.packets.size());
+	}
+	
 	public boolean isEmpty()
 	{
 		return this.packets.isEmpty();
 	}
 	
 	public Packet getNext()
-	{
+	{		
 		if(this.naks.isEmpty())
-		{		
+		{	
 			if(index < this.packets.size())			
 				return this.packets.get(index++);
 			
-			return null;
+			return null;				
 		}
 		
 		Iterator<Byte> iterator = this.naks.iterator();
