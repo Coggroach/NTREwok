@@ -16,7 +16,6 @@ public class NetworkServer
 {
 	static ServerSocket server;
 	static BaseSocket common = null;
-	static StringBuilder output = new StringBuilder();
 	static PacketHandler handler = new PacketHandler(PacketHandler.SERVER);
 
 	public static void main(String args[])
@@ -38,17 +37,18 @@ public class NetworkServer
 			public boolean listen()
 			{
 				boolean run = true;
-				try
-				{
-					while (run)
+				while (run)
+					try
+					{
 						if (common.available())
 							handler.add(common.receive());// Gremlin.receive(common.receive());
-				}
-				catch (IOException e)
-				{
-					System.err.println("Client Disconnected");
-					run = false;
-				}
+					}
+					catch (IOException e)
+					{
+						System.err.println("Client Disconnected");
+						handler.stop();
+						run = false;
+					}
 				return run;
 			}
 		});
@@ -60,18 +60,17 @@ public class NetworkServer
 
 			common.run();
 
-			while (!handler.isEmpty())
+			while (!handler.isCompleted())
 			{
 				Packet p = handler.getNext();
 				if (p != null)
 				{
-					System.out.println("ACK:" + p.getAddress());
-					common.transmit(PacketHandler.getAckPacket(p.getAddress()));
-					output.append(p.getString());
+					common.transmit(PacketHandler.getAckPacket(p.getAddress()));					
 				}
 			}
 
-			FileIO.writeToFile(new File("res/Output.txt"), output.toString());
+			FileIO.writeToFile(new File(FileIO.OUTPUT), handler.toString());
+			handler.stop();
 			handler.print();
 			handler.clear();
 			common.close();
@@ -80,5 +79,6 @@ public class NetworkServer
 		{
 			e.printStackTrace();
 		}
+		System.exit(0);
 	}
 }

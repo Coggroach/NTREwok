@@ -15,6 +15,8 @@ public class PacketHandler
 	private List<Byte> naks;
 	private int index;
 	private int mode;
+	private boolean forceStop;
+	private boolean endOfStream;
 
 	public PacketHandler(int i)
 	{
@@ -22,6 +24,13 @@ public class PacketHandler
 		this.naks = new ArrayList<Byte>();
 		this.index = 0;
 		this.mode = i;
+		this.forceStop = false;
+		this.endOfStream = false;
+	}
+	
+	public void stop()
+	{
+		this.forceStop = true;
 	}
 
 	public List<Packet> getPackets()
@@ -65,6 +74,7 @@ public class PacketHandler
 	public void print()
 	{
 		System.out.println("PacketHandler");
+		System.out.println("Running: " + !this.forceStop);
 		System.out.println("Packets: " + this.packets.size());
 		System.out.println("Naks   : " + this.naks.size());
 	}
@@ -76,14 +86,22 @@ public class PacketHandler
 
 	public boolean isEmpty()
 	{
+		if(this.forceStop)
+			return true;
+		
 		switch(mode)
 		{
 			case CLIENT:
 				return this.packets.isEmpty() && this.naks.isEmpty();
 			case SERVER:
-				return false;
+				return this.endOfStream && this.packets.isEmpty();
 		}
 		return false;
+	}
+	
+	public boolean isCompleted()
+	{
+		return this.endOfStream || this.forceStop;
 	}
 
 	public Packet getNext()
@@ -100,10 +118,16 @@ public class PacketHandler
 	
 	private Packet getNextServer()
 	{
+		Packet p = null;
 		if (index < this.packets.size())
-			return this.packets.get(index++);
-		
-		return null;
+		{
+			p = this.packets.get(index++);
+			
+			if(p != null)
+			if(p.isSameProtocol(NetworkInfo.END_PROTOCOL))
+				this.endOfStream = true;			
+		}
+		return p;
 	}
 
 	private Packet getNextClient()
@@ -157,8 +181,7 @@ public class PacketHandler
 		}
 		else if (p.isSameProtocol(NetworkInfo.NAK_PROTOCOL))
 		{
-			this.naks.add(p.getAddress());
-			System.out.println("Added NAK");
+			this.naks.add(p.getAddress());			
 		}
 	}
 
@@ -171,11 +194,27 @@ public class PacketHandler
 		{
 			Packet p = new Packet();
 			p.add(s.substring(index, index + length));
-			p.setProtocol(NetworkInfo.SND_PROTOCOL);
+			
+			if(i == count - 1)
+				p.setProtocol(NetworkInfo.END_PROTOCOL);
+			else
+				p.setProtocol(NetworkInfo.SND_PROTOCOL);
+			
 			p.getPacketToSend((byte) i);
 			this.packets.add(p);
 			index += length;
 		}
+	}
+	
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder();
+		Iterator<Packet> iterator = this.packets.iterator();
+		while(iterator.hasNext())
+		{
+			builder.append(iterator.next().getString());
+		}
+		return builder.toString();
 	}
 
 	public int length()

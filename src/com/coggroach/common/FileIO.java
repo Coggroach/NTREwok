@@ -9,6 +9,9 @@ import java.util.Random;
 
 public class FileIO
 {
+	public static String INPUT = "res/input.txt";
+	public static String OUTPUT = "res/Output.txt";
+	
 	public static File createFile(String name) throws IOException
 	{
 		File f = new File(name);

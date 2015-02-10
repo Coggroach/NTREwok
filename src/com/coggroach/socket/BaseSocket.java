@@ -110,7 +110,6 @@ public class BaseSocket
 	
 	public void run()
 	{
-		Thread t = new Thread(this.worker);
-		t.start();
+		new Thread(this.worker).start();		
 	}
 }

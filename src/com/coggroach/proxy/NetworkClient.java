@@ -15,7 +15,7 @@ public class NetworkClient
 {
 	static BaseSocket client = null;
 	static PacketHandler handler = new PacketHandler(PacketHandler.CLIENT);
-	
+
 	public static void main(String args[])
 	{
 		try
@@ -29,27 +29,24 @@ public class NetworkClient
 			e.printStackTrace();
 			System.exit(-1);
 		}
-		
-
 
 		client.setSocketListener(new SocketListener()
 		{
 			@Override
 			public boolean listen()
-			{		
+			{
 				boolean run = true;
-				try
-				{
-					while(run)
-						if(client.available())
+				while (run)
+					try
+					{
+						if (client.available())
 							handler.onReceive(client.receive());
-				}
-				catch (IOException e)
-				{				
-					run = false;
-					//System.err.println("Connection Closed.");
-					//e.printStackTrace();
-				}
+					}
+					catch (IOException e)
+					{
+						run = false;
+						handler.stop();
+					}
 				return run;
 			}
 		});
@@ -57,22 +54,22 @@ public class NetworkClient
 		try
 		{
 			client.print();
-			
-			handler.process(FileIO.readFromFile(new File("res/Input.txt")));
+
+			handler.process(FileIO.readFromFile(new File(FileIO.INPUT)));
 			handler.print();
-			
+
 			client.run();
 
 			while (!handler.isEmpty())
 			{
 				Packet p = handler.getNext();
-				if(p != null)
+				if (p != null)
 				{
-					System.out.println("SND:" + p.getAddress());
 					client.transmit(p);
 				}
 			}
 
+			handler.stop();
 			handler.print();
 			handler.clear();
 			client.close();
@@ -85,6 +82,7 @@ public class NetworkClient
 		{
 			e.printStackTrace();
 		}
+		System.exit(0);
 
 	}
 }
