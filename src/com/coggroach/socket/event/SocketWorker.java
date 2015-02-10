@@ -26,7 +26,7 @@ public class SocketWorker implements Runnable
 			{
 				if (this.listener != null)
 				{
-					this.listener.listen();
+					this.isRunning = this.listener.listen();
 				}
 				else if (this.listener == null)
 				{

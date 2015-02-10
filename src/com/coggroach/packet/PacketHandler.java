@@ -188,7 +188,7 @@ public class PacketHandler
 	public void process(String s) throws PacketException
 	{
 		int length = NetworkInfo.getLength(NetworkInfo.PAYLOAD);
-		int count = s.length() / length;
+		int count = (int) Math.ceil(s.length() / length);
 		int index = 0;
 		for (int i = 0; i < count; i++)
 		{
