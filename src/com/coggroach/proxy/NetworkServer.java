@@ -9,29 +9,28 @@ import com.coggroach.common.Gremlin;
 import com.coggroach.common.NetworkInfo;
 import com.coggroach.packet.Packet;
 import com.coggroach.packet.PacketHandler;
-import com.coggroach.socket.CommonSocket;
-import com.coggroach.socket.SocketListener;
+import com.coggroach.socket.BaseSocket;
+import com.coggroach.socket.event.SocketListener;
 
 public class NetworkServer
 {
 	static ServerSocket server;
-	static CommonSocket common = null;
+	static BaseSocket common = null;
 	static StringBuilder output = new StringBuilder();
-	
+	static PacketHandler handler = new PacketHandler(PacketHandler.SERVER);
+
 	public static void main(String args[])
-	{		
+	{
 		try
 		{
 			server = new ServerSocket(NetworkInfo.SOCKET);
-			common = new CommonSocket(server.accept(), "Server0");
+			common = new BaseSocket(server.accept(), "Server0");
 			common.setTimeOut();
 		}
 		catch (IOException e1)
 		{
 			e1.printStackTrace();
 		}
-		
-		common.print();
 
 		common.setSocketListener(new SocketListener()
 		{
@@ -39,37 +38,46 @@ public class NetworkServer
 			public boolean listen()
 			{
 				boolean run = true;
-				while (run)
+				try
 				{
-					try
-					{
-						Packet p = common.receive();//Gremlin.receive(common.receive());
-						if(true)//p.isValid()
-						{	
-							common.transmit(PacketHandler.getAckPacket(p.getAddress()));
-							output.append(p.getString());						
-						}						
-						//p.print();
-					}
-					catch (IOException e)
-					{
-						System.err.println("Client Disconnected");
-						run = false;						
-					}
+					while (run)
+						if (common.available())
+							handler.add(common.receive());// Gremlin.receive(common.receive());
 				}
-				return false;
+				catch (IOException e)
+				{
+					System.err.println("Client Disconnected");
+					run = false;
+				}
+				return run;
 			}
 		});
-		
-		common.run();		
-		
-		File f = new File("res/Output.txt");	
+
 		try
 		{
-			FileIO.writeToFile(f, output.toString());
+			common.print();
+			handler.print();
+
+			common.run();
+
+			while (!handler.isEmpty())
+			{
+				Packet p = handler.getNext();
+				if (p != null)
+				{
+					System.out.println("ACK:" + p.getAddress());
+					common.transmit(PacketHandler.getAckPacket(p.getAddress()));
+					output.append(p.getString());
+				}
+			}
+
+			FileIO.writeToFile(new File("res/Output.txt"), output.toString());
+			handler.print();
+			handler.clear();
+			common.close();
 		}
 		catch (IOException e)
-		{		
+		{
 			e.printStackTrace();
 		}
 	}

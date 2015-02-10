@@ -1,37 +1,42 @@
 package com.coggroach.socket.event;
 
-import java.io.IOException;
-import java.io.InputStream;
 
-public class SocketWorker implements Runnable 
+public class SocketWorker implements Runnable
 {
-	private InputStream stream;
 	private boolean isRunning;
-	
-	public SocketWorker(InputStream stream)
+	private SocketListener listener;
+
+	public SocketWorker()
 	{
-		this.stream = stream;
 		this.isRunning = true;
+		this.listener = null;
+	}
+
+	public void setSocketListener(SocketListener l)
+	{
+		this.listener = l;
 	}
 
 	@Override
-	public void run() 
-	{	
-		try 
+	public void run()
+	{
+		try
 		{
-			while(this.isRunning)
+			while (this.isRunning)
 			{
-				if(this.stream.available() != 0)
+				if (this.listener != null)
 				{
-					
+					this.listener.listen();
 				}
-				Thread.sleep(1);
+				else if (this.listener == null)
+				{
+					throw new Exception("SocketListener not set...");
+				}
 			}
-		} 
-		catch (IOException | InterruptedException e) 
-		{		
+		}
+		catch (Exception e)
+		{
 			e.printStackTrace();
 		}
 	}
-
 }

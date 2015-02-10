@@ -10,27 +10,46 @@ import java.net.UnknownHostException;
 import com.coggroach.common.NetworkInfo;
 import com.coggroach.packet.Packet;
 import com.coggroach.packet.PacketException;
+import com.coggroach.socket.event.SocketListener;
+import com.coggroach.socket.event.SocketWorker;
 
-public class CommonSocket implements Runnable
+public class BaseSocket
 {
 	private Socket socket;
 	private InputStream input;
 	private OutputStream output;
 	private String identity;
-	private SocketListener listener;
+	private SocketWorker worker;
 
-	public CommonSocket(int socket) throws UnknownHostException, IOException,
+	public BaseSocket(int socket) throws UnknownHostException, IOException,
 			SocketException
 	{
 		this(new Socket(NetworkInfo.IPADDRESS, socket), null);
 	}
 
-	public CommonSocket(Socket s, String id) throws IOException
+	public BaseSocket(Socket s, String id) throws IOException
 	{
 		this.socket = s;
-		this.init();
+		this.input = socket.getInputStream();
+		this.output = socket.getOutputStream();
 		this.identity = id;
-		this.listener = null;
+		this.worker = new SocketWorker();
+	}
+	
+	
+	public boolean isConnected()
+	{
+		return socket.isClosed();
+	}
+	
+	public SocketWorker getWorker()
+	{
+		return this.worker;
+	}
+	
+	public boolean available() throws IOException
+	{
+		return this.input.available() != 0;
 	}
 	
 	public void print()
@@ -67,13 +86,7 @@ public class CommonSocket implements Runnable
 
 	public void setSocketListener(SocketListener listener)
 	{
-		this.listener = listener;
-	}
-
-	private void init() throws IOException
-	{
-		this.input = socket.getInputStream();
-		this.output = socket.getOutputStream();
+		this.worker.setSocketListener(listener);
 	}
 
 	public void transmit(Packet p) throws IOException
@@ -94,13 +107,10 @@ public class CommonSocket implements Runnable
 		input.read(p.getBytes());
 		return p;
 	}
-
-	@Override
+	
 	public void run()
 	{
-		if (this.listener != null)
-		{
-			this.listener.listen();
-		}
+		Thread t = new Thread(this.worker);
+		t.start();
 	}
 }

@@ -1,4 +1,4 @@
-package com.coggroach.socket;
+package com.coggroach.socket.event;
 
 public interface SocketListener
 {

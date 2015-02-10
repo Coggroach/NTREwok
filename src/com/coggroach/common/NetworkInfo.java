@@ -23,13 +23,17 @@ public class NetworkInfo
 	
 	public static byte ACK_PROTOCOL;
 	public static byte NAK_PROTOCOL;
-	public static byte SND_PROTOCOL;	
+	public static byte SND_PROTOCOL;
+	public static byte END_PROTOCOL;
+	public static byte FLAG_C;
 	
 	static
 	{
 		ACK_PROTOCOL = 0b00111100;
 		NAK_PROTOCOL = 0b01100110;
-		SND_PROTOCOL = 0b00000001;		
+		SND_PROTOCOL = 0b00000001;
+		END_PROTOCOL = 0b00001111;
+		FLAG_C = 0b01111110;
 	}	
 	
 	public static int getMaxPacketSize()

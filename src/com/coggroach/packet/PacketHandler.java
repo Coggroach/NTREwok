@@ -8,108 +8,139 @@ import com.coggroach.common.NetworkInfo;
 
 public class PacketHandler
 {
-	private List<Packet> packets;		
+	public static final int SERVER = 0;
+	public static final int CLIENT = 1;
+
+	private List<Packet> packets;
 	private List<Byte> naks;
 	private int index;
-	
-	public PacketHandler()
+	private int mode;
+
+	public PacketHandler(int i)
 	{
-		this.packets = new ArrayList<Packet>();		
+		this.packets = new ArrayList<Packet>();
 		this.naks = new ArrayList<Byte>();
 		this.index = 0;
+		this.mode = i;
 	}
-	
+
 	public List<Packet> getPackets()
 	{
 		return this.packets;
 	}
-	
+
 	public void clear()
 	{
-		this.packets.clear();		
-		this.naks.clear();	
+		this.packets.clear();
+		this.naks.clear();
 		this.index = 0;
 	}
-	
-	public void addPacket(Packet p)
+
+	public void add(Packet p)
 	{
 		this.packets.add(p);
 	}
-	
+
 	public List<Byte> getMissingPacketAddress()
 	{
-//		/Iterator<Packet>
 		return null;
 	}
-	
+
 	public static Packet getAckPacket(byte address)
 	{
 		Packet p = new Packet();
 		p.setProtocol(NetworkInfo.ACK_PROTOCOL);
-		p.setAddress(address);		
+		p.setAddress(address);
 		return p.wrap();
-	}	
-	
+	}
+
 	public static Packet getNakPacket(byte address)
 	{
 		Packet p = new Packet();
 		p.setProtocol(NetworkInfo.NAK_PROTOCOL);
-		p.setAddress(address);		
+		p.setAddress(address);
 		return p.wrap();
 	}
-	
+
 	public void print()
 	{
 		System.out.println("PacketHandler");
 		System.out.println("Packets: " + this.packets.size());
 		System.out.println("Naks   : " + this.naks.size());
 	}
-	
+
 	public void print(int i)
 	{
 		System.out.println("Packets: " + this.packets.size());
 	}
-	
+
 	public boolean isEmpty()
 	{
-		return this.packets.isEmpty();
-	}
-	
-	public Packet getNext()
-	{		
-		if(this.naks.isEmpty())
-		{	
-			if(index < this.packets.size())			
-				return this.packets.get(index++);
-			
-			return null;				
-		}
-		
-		Iterator<Byte> iterator = this.naks.iterator();
-		byte address = iterator.next();
-		iterator.remove();	
-		
-		return this.getPacketWithAddress(address);
-	}
-	
-	private Packet getPacketWithAddress(byte b)
-	{
-		Iterator<Packet> iterator = this.packets.iterator();
-		while(iterator.hasNext())
+		switch(mode)
 		{
-			Packet p = iterator.next();
-			if(p.hasSameAddress(b))
-				return p;
+			case CLIENT:
+				return this.packets.isEmpty() && this.naks.isEmpty();
+			case SERVER:
+				return false;
+		}
+		return false;
+	}
+
+	public Packet getNext()
+	{
+		switch (mode)
+		{
+			case CLIENT:
+				return getNextClient();
+			case SERVER:
+				return getNextServer();
 		}
 		return null;
 	}
 	
+	private Packet getNextServer()
+	{
+		if (index < this.packets.size())
+			return this.packets.get(index++);
+		
+		return null;
+	}
+
+	private Packet getNextClient()
+	{
+		if (this.naks.isEmpty())
+		{
+			if (index < this.packets.size())
+				return this.packets.get(index++);
+
+			return null;
+		}
+
+		Iterator<Byte> iterator = this.naks.iterator();
+		byte address = iterator.next();
+		iterator.remove();
+
+		return this.getPacketWithAddress(address);
+	}
+
+	private Packet getPacketWithAddress(byte b)
+	{
+		Iterator<Packet> iterator = this.packets.iterator();
+		while (iterator.hasNext())
+		{
+			Packet p = iterator.next();
+			if (p.hasSameAddress(b))
+				return p;
+		}
+		return null;
+	}
+
 	private void removePacketWithAddress(byte b)
 	{
 		Iterator<Packet> iterator = this.packets.iterator();
-		while(iterator.hasNext())
+		while (iterator.hasNext())
 		{
-			if(iterator.next().hasSameAddress(b))
+			if (iterator.next().hasSameAddress(b))
 			{
 				iterator.remove();
 				index--;
@@ -117,36 +148,36 @@ public class PacketHandler
 			}
 		}
 	}
-	
+
 	public void onReceive(Packet p)
 	{
-		if(p.isSameProtocol(NetworkInfo.ACK_PROTOCOL))
+		if (p.isSameProtocol(NetworkInfo.ACK_PROTOCOL))
 		{
 			this.removePacketWithAddress(p.getAddress());
 		}
-		else if(p.isSameProtocol(NetworkInfo.NAK_PROTOCOL))
+		else if (p.isSameProtocol(NetworkInfo.NAK_PROTOCOL))
 		{
 			this.naks.add(p.getAddress());
 			System.out.println("Added NAK");
 		}
 	}
-	
+
 	public void process(String s) throws PacketException
 	{
 		int length = NetworkInfo.getLength(NetworkInfo.PAYLOAD);
-		int count = s.length()/length;
+		int count = s.length() / length;
 		int index = 0;
-		for(int i = 0; i < count; i++)
+		for (int i = 0; i < count; i++)
 		{
 			Packet p = new Packet();
 			p.add(s.substring(index, index + length));
 			p.setProtocol(NetworkInfo.SND_PROTOCOL);
-			p.getPacketToSend((byte) i);		
+			p.getPacketToSend((byte) i);
 			this.packets.add(p);
 			index += length;
 		}
 	}
-	
+
 	public int length()
 	{
 		return this.packets.size();
