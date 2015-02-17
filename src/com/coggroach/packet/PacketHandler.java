@@ -47,24 +47,32 @@ public class PacketHandler
 
 	public void add(Packet p)
 	{
-		if(this.mode == SERVER)
+		if(this.mode == SERVER && p != null)
 		{
-			if(p.isValid())
-			{
-				this.packets.add(p);
-			}
-			else
+			if(!p.isValid())
 			{
 				this.naks.add(p.getAddress());
 			}
+			else
+			{
+				this.packets.add(p);				
+			}
 		}
 	}
-
-	public List<Byte> getMissingPacketAddress()
+	
+	public void addMissingPackets()
 	{
-		return null;
+		for(int i = 0; i < this.packets.size(); i++)
+		{
+			Packet p = this.packets.get(i);
+			if(p.getAddress() != i && !this.naks.contains(Byte.valueOf((byte) i)))
+			{
+				this.naks.add(Byte.valueOf((byte) i));
+				return;
+			}			
+		}
 	}
-
+	
 	public static Packet getAckPacket(byte address)
 	{
 		Packet p = new Packet();
@@ -139,6 +147,7 @@ public class PacketHandler
 			iterator.remove();
 
 			p = this.getPacketWithAddress(address);
+			if(p != null)
 			ack = getNakPacket(p.getAddress());
 		}
 		else
@@ -216,6 +225,7 @@ public class PacketHandler
 		int length = NetworkInfo.getLength(NetworkInfo.PAYLOAD);
 		int count = (int) Math.ceil(s.length() / length);
 		int index = 0;
+		int maxPacket = NetworkInfo.getMaxPacketStorage();
 		for (int i = 0; i < count; i++)
 		{
 			Packet p = new Packet();
@@ -226,7 +236,7 @@ public class PacketHandler
 			else
 				p.setProtocol(NetworkInfo.SND_PROTOCOL);
 			
-			p.wrap((byte) i);
+			p.wrap((byte) (i % maxPacket));
 			this.packets.add(p);
 			index += length;
 		}
