@@ -65,7 +65,7 @@ public class NetworkServer
 				Packet p = handler.getNext();
 				if (p != null)
 				{
-					common.transmit(PacketHandler.getAckPacket(p.getAddress()));					
+					common.transmit(p);					
 				}
 			}
 

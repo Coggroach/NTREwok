@@ -31,11 +31,12 @@ public class Packet
 		this.stream[NetworkInfo.getIndex(NetworkInfo.CHECKSUM)] = (byte) i;
 	}
 
-	public Packet getPacketToSend(byte b)
+	public Packet wrap(byte address)
 	{
 		this.initPacket();
 		this.setChecksum(this.preformChecksum());
-		this.setAddress(b);
+		this.setAddress(address);
+		this.preScan();
 		return this;
 	}
 
@@ -108,7 +109,7 @@ public class Packet
 	{
 		return this.preformChecksum() == this.stream[NetworkInfo.getIndex(NetworkInfo.CHECKSUM)] && 
 				this.stream[ NetworkInfo.getIndex(NetworkInfo.HEADER)] == NetworkInfo.FLAG_C &&
-				this.stream[ NetworkInfo.getIndex(NetworkInfo.TRAILER)] == NetworkInfo.FLAG_C;
+				this.stream[ NetworkInfo.getIndex(NetworkInfo.TRAILER, 0)] == NetworkInfo.FLAG_C;
 	}
 
 	public void add(String s) throws PacketException
@@ -126,11 +127,6 @@ public class Packet
 		int length = NetworkInfo.getLength(NetworkInfo.PAYLOAD);
 		int index = NetworkInfo.getIndex(NetworkInfo.PAYLOAD);
 
-		// System.out.println("PayloadLength: " + b.length);
-		// System.out.println("StreamLength: " + this.stream.length);
-		// System.out.println("Index: " + index);
-		// System.out.println("Length: " + length);
-
 		if (b.length > length)
 			throw new PacketException();
 
@@ -139,5 +135,26 @@ public class Packet
 			this.stream[i + index] = b[j];
 		}
 	}
-
+	
+	private void preScan()
+	{
+		for(int i = NetworkInfo.getIndex(NetworkInfo.HEADER + 1); i < NetworkInfo.getIndex(NetworkInfo.TRAILER); i++)
+		{
+			if(this.stream[i] == NetworkInfo.FLAG_C)
+			{
+				this.stream[i] ^= NetworkInfo.MASK_C;
+			}
+		}			
+	}
+	
+	private void postScan()
+	{
+		for(int i = NetworkInfo.getIndex(NetworkInfo.HEADER + 1); i < NetworkInfo.getIndex(NetworkInfo.TRAILER); i++)
+		{
+			if(this.stream[i] == NetworkInfo.MASK_C)
+			{
+				this.stream[i] ^= NetworkInfo.MASK_C;
+			}
+		}	
+	}
 }

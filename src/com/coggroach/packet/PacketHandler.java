@@ -47,7 +47,17 @@ public class PacketHandler
 
 	public void add(Packet p)
 	{
-		this.packets.add(p);
+		if(this.mode == SERVER)
+		{
+			if(p.isValid())
+			{
+				this.packets.add(p);
+			}
+			else
+			{
+				this.naks.add(p.getAddress());
+			}
+		}
 	}
 
 	public List<Byte> getMissingPacketAddress()
@@ -77,6 +87,7 @@ public class PacketHandler
 		System.out.println("Running: " + !this.forceStop);
 		System.out.println("Packets: " + this.packets.size());
 		System.out.println("Naks   : " + this.naks.size());
+		System.out.println("Mode   : " + this.mode);
 	}
 
 	public void print(int i)
@@ -119,15 +130,30 @@ public class PacketHandler
 	private Packet getNextServer()
 	{
 		Packet p = null;
-		if (index < this.packets.size())
+		Packet ack = null;
+		
+		if(!this.naks.isEmpty())
 		{
-			p = this.packets.get(index++);
-			
-			if(p != null)
-			if(p.isSameProtocol(NetworkInfo.END_PROTOCOL))
-				this.endOfStream = true;			
+			Iterator<Byte> iterator = this.naks.iterator();
+			byte address = iterator.next();
+			iterator.remove();
+
+			p = this.getPacketWithAddress(address);
+			ack = getNakPacket(p.getAddress());
 		}
-		return p;
+		else
+		{
+			if (index < this.packets.size())
+			{
+				p = this.packets.get(index++);
+				ack = getAckPacket(p.getAddress());
+				
+				if(p != null)
+				if(p.isSameProtocol(NetworkInfo.END_PROTOCOL))
+					this.endOfStream = true;		
+			}
+		}		
+		return ack;
 	}
 
 	private Packet getNextClient()
@@ -200,7 +226,7 @@ public class PacketHandler
 			else
 				p.setProtocol(NetworkInfo.SND_PROTOCOL);
 			
-			p.getPacketToSend((byte) i);
+			p.wrap((byte) i);
 			this.packets.add(p);
 			index += length;
 		}
