@@ -11,7 +11,7 @@ public class NetworkInfo
 	private static final int ADDRESS_LENGTH = 1;
 	private static final int CHECKSUM_LENGTH = 1;
 	private static final int MAX_PAYLOAD_LENGTH = 16;
-	private static final int PROTOCOL_LENGTH = 1;
+	private static final int PROTOCOL_LENGTH = 1 + (int) Math.ceil( (ADDRESS_LENGTH + CHECKSUM_LENGTH + MAX_PAYLOAD_LENGTH)/8);
 	
 	public static final int HEADER = 0;
 	public static final int ADDRESS = 1;
@@ -36,14 +36,7 @@ public class NetworkInfo
 		END_PROTOCOL = 0b00001111;
 		FLAG_C = 0b01111110;
 		MASK_C = 0b01010101;
-	}
-	
-	private static int MAX_PACKET_STORAGE = (int) Math.pow(2, ADDRESS_LENGTH * 8);
-	
-	public static int getMaxPacketStorage()
-	{
-		return MAX_PACKET_STORAGE;
-	}
+	}	
 	
 	public static int getMaxPacketSize()
 	{

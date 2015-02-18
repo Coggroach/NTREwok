@@ -109,7 +109,7 @@ public class Packet
 	{
 		return this.preformChecksum() == this.stream[NetworkInfo.getIndex(NetworkInfo.CHECKSUM)] && 
 				this.stream[ NetworkInfo.getIndex(NetworkInfo.HEADER)] == NetworkInfo.FLAG_C &&
-				this.stream[ this.stream.length - 1 ] == NetworkInfo.FLAG_C;
+				this.stream[ NetworkInfo.getIndex(NetworkInfo.TRAILER, 0)] == NetworkInfo.FLAG_C;
 	}
 
 	public void add(String s) throws PacketException
@@ -136,20 +136,25 @@ public class Packet
 		}
 	}
 	
-	
 	private void preScan()
 	{
-
+		for(int i = NetworkInfo.getIndex(NetworkInfo.HEADER + 1); i < NetworkInfo.getIndex(NetworkInfo.TRAILER); i++)
+		{
+			if(this.stream[i] == NetworkInfo.FLAG_C)
+			{
+				this.stream[i] ^= NetworkInfo.MASK_C;
+			}
+		}			
 	}
 	
-//	private void postScan()
-//	{
-//		for(int i = NetworkInfo.getIndex(NetworkInfo.HEADER + 1); i < NetworkInfo.getIndex(NetworkInfo.TRAILER); i++)
-//		{
-//			if(this.stream[i] == NetworkInfo.MASK_C)
-//			{
-//				this.stream[i] ^= NetworkInfo.MASK_C;
-//			}
-//		}	
-//	}
+	private void postScan()
+	{
+		for(int i = NetworkInfo.getIndex(NetworkInfo.HEADER + 1); i < NetworkInfo.getIndex(NetworkInfo.TRAILER); i++)
+		{
+			if(this.stream[i] == NetworkInfo.MASK_C)
+			{
+				this.stream[i] ^= NetworkInfo.MASK_C;
+			}
+		}	
+	}
 }
