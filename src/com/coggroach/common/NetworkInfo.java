@@ -11,7 +11,7 @@ public class NetworkInfo
 	private static final int ADDRESS_LENGTH = 1;
 	private static final int CHECKSUM_LENGTH = 1;
 	private static final int MAX_PAYLOAD_LENGTH = 16;
-	private static final int PROTOCOL_LENGTH = 1 + (int) Math.ceil( (ADDRESS_LENGTH + CHECKSUM_LENGTH + MAX_PAYLOAD_LENGTH)/8);
+	private static final int PROTOCOL_LENGTH = 1;
 	
 	public static final int HEADER = 0;
 	public static final int ADDRESS = 1;
@@ -26,7 +26,6 @@ public class NetworkInfo
 	public static byte SND_PROTOCOL;
 	public static byte END_PROTOCOL;
 	public static byte FLAG_C;
-	public static byte MASK_C;
 	
 	static
 	{
@@ -35,7 +34,6 @@ public class NetworkInfo
 		SND_PROTOCOL = 0b00000001;
 		END_PROTOCOL = 0b00001111;
 		FLAG_C = 0b01111110;
-		MASK_C = 0b01010101;
 	}	
 	
 	public static int getMaxPacketSize()
@@ -86,8 +84,4 @@ public class NetworkInfo
 		return index;
 	}
 	
-	public static int getIndex(int code, int back)
-	{
-		return getIndex(code + 1) - 1;
-	}	
 }
